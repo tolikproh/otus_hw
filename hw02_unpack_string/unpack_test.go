@@ -45,6 +45,7 @@ func TestUnpack(t *testing.T) {
 		{input: "п2р3с4", expected: "ппрррсссс"},
 		{input: "!@4#2", expected: "!@@@@##"},
 		{input: `\4\5abc3`, expected: "45abccc"},
+		{input: `фффффф\\`, expected: `фффффф\`},
 	}
 
 	for _, tc := range tests {
@@ -65,7 +66,8 @@ func TestUnpackError(t *testing.T) {
 		{input: "45", expectedErr: ErrStartsWithDigit},
 		{input: "aaa10b", expectedErr: ErrConsecutiveDigits},
 		{input: `qw\ne`, expectedErr: ErrInvalidString},
-		{input: `dhg43d\`, expectedErr: ErrBackSlashEndString},
+		{input: `dhg43d\`, expectedErr: ErrConsecutiveDigits},
+		{input: `dhg4d\`, expectedErr: ErrBackSlashEndString},
 		{input: `"日3\本2"`, expectedErr: ErrInvalidString},
 		{input: `2😅1😎😇0ен`, expectedErr: ErrStartsWithDigit},
 		{input: `😅0ен\`, expectedErr: ErrBackSlashEndString},

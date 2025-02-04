@@ -45,10 +45,6 @@ func Unpack(in string) (string, error) {
 	if isDigit(runes[0]) {
 		return "", ErrStartsWithDigit
 	}
-	// Проверка если последний символ обратный слэш.
-	if isBackSlash(runes[maxLen-1]) {
-		return "", ErrBackSlashEndString
-	}
 
 	// Инициализация в памяти переменной.
 	var result strings.Builder
@@ -67,6 +63,10 @@ func Unpack(in string) (string, error) {
 		// если это так то читаем следующий символ и проверяем его,
 		// что он цифра или обратный слэш, иначе выход с ошибкой.
 		if isBackSlash(curr) {
+			// Проверка если последний символ обратный слэш.
+			if i >= maxLen-1 {
+				return "", ErrBackSlashEndString
+			}
 			i++
 			curr = runes[i]
 			if !isDigit(curr) && !isBackSlash(curr) {
