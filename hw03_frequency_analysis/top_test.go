@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed.
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -79,4 +79,42 @@ func TestTop10(t *testing.T) {
 			require.Equal(t, expected, Top10(text))
 		}
 	})
+}
+
+func TestTop10Add(t *testing.T) {
+	testsText := []struct {
+		text     string
+		expected []string
+	}{
+		{
+			text:     "dog,cat dog...cat dogcat dogcat dogcat dog...cat",
+			expected: []string{"dogcat", "dog...cat", "dog,cat"},
+		},
+		{
+			text:     "cat and dog, one dog,two cats and one man",
+			expected: []string{"and", "one", "cat", "cats", "dog", "dog,two", "man"},
+		},
+		{
+			text:     "Нога нога нога! нога, 'нога' - - - ---- ---- какойто какойто какой-то какой-то какой-то",
+			expected: []string{"нога", "какой-то", "----", "какойто"},
+		},
+		{
+			text: `Погода вначале была хорошая, тихая. Кричали дрозды, и по соседству в болотах что-то 
+			живое жалобно гудело, точно дуло в пустую бутылку. Протянул один вальдшнеп, и выстрел по нем 
+			прозвучал в весеннем воздухе раскатисто и весело. Но когда стемнело в лесу, некстати подул с 
+			востока холодный пронизывающий ветер, всё смолкло. По лужам протянулись ледяные иглы, и стало 
+			в лесу неуютно, глухо и нелюдимо. Запахло зимой.`,
+			expected: []string{"в", "и", "по", "лесу", "болотах", "бутылку", "была", "вальдшнеп", "весело", "весеннем"},
+		},
+		{
+			text:     "- - - - - - - - - ",
+			expected: []string{},
+		},
+	}
+
+	for _, tc := range testsText {
+		t.Run(tc.text, func(t *testing.T) {
+			require.Equal(t, tc.expected, Top10(tc.text))
+		})
+	}
 }
