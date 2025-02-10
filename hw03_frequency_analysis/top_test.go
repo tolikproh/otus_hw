@@ -110,6 +110,10 @@ func TestTop10Add(t *testing.T) {
 			text:     "- - - - - - - - - ",
 			expected: []string{},
 		},
+		{
+			text:     "-abc abc- -~abc,- ---- ---- -- -- -- --- --*-,-;-ab_dc?!-",
+			expected: []string{"--", "abc", "----", "---", "ab_dc"},
+		},
 	}
 
 	for _, tc := range testsText {

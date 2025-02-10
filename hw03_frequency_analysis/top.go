@@ -1,9 +1,34 @@
 package hw03frequencyanalysis
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
+
+// Объявление переменных на уровне пакета.
+var (
+	// Регулярное выражение для проверки, если только дефисы в строке.
+	hyphensReg = regexp.MustCompile(`^-{2,}$`)
+	// Регулярное выражение для очиски начала и конца строки от пунктуаций.
+	trimReg = regexp.MustCompile(`^[[:punct:]]+|[[:punct:]]+$`)
+)
+
+// Удаление лишних пунктуаций.
+func trim(in *string) bool {
+	if hyphensReg.MatchString(*in) {
+		return true
+	}
+
+	out := trimReg.ReplaceAllString(strings.ToLower(*in), "")
+
+	if out == "" {
+		return false
+	}
+
+	*in = out
+	return true
+}
 
 // Top10 возвращает 10 самых часто встречающихся слов в тексте.
 // Если слова имеют одинаковую частоту, они сортируются лексикографически.
@@ -18,12 +43,9 @@ func Top10(text string) []string {
 	// Создаётся map для подсчета частоты слов.
 	frequency := make(map[string]int)
 	for _, word := range words {
-		word = strings.ToLower(word)
-		word = strings.Trim(word, "!\"#$%&'()*+,./:;<=>?@[]\\^{|}~")
-		if word == "-" || word == "" {
-			continue
+		if trim(&word) {
+			frequency[word]++
 		}
-		frequency[word]++
 	}
 
 	// Создается слайс для хранения уникальных слов
