@@ -49,14 +49,61 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
+	// Дополнительный тест на логику работы.
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(3)
+
+		c.Set("a", 1)
+		c.Set("b", 2)
+		c.Set("c", 3)
+		// Должен вытеснить "a"
+		c.Set("d", 4)
+
+		// Проверка наличия "a"
+		_, ok := c.Get("a")
+		require.False(t, ok)
+
+		// Считываю давний элемент и проверяю, что он существует.
+		val, ok := c.Get("b")
+		require.True(t, ok)
+		require.Equal(t, 2, val)
+
+		// Добавление нового элемента
+		c.Set("e", 5)
+		// Проверка на вытеснение "c", который был затронут наиболее давно.
+		_, ok = c.Get("c")
+		require.False(t, ok)
+	})
+
+	// Тест на кэш с нулевой емкостью.
+	t.Run("null capacity", func(t *testing.T) {
+		c := NewCache(0)
+
+		c.Set("a", 1)
+		c.Set("b", 2)
+		c.Set("c", 3)
+
+		_, ok := c.Get("a")
+		require.False(t, ok)
+	})
+
+	// Дополнительный тест на очистку кэша.
+	t.Run("clear", func(t *testing.T) {
+		c := NewCache(5)
+
+		c.Set("a", 1)
+		c.Set("b", 2)
+
+		c.Clear()
+
+		_, ok := c.Get("a")
+		require.False(t, ok)
+		_, ok = c.Get("b")
+		require.False(t, ok)
 	})
 }
 
-func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
+func TestCacheMultithreading(_ *testing.T) {
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
