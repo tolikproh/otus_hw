@@ -13,6 +13,11 @@ func TestList(t *testing.T) {
 		require.Equal(t, 0, l.Len())
 		require.Nil(t, l.Front())
 		require.Nil(t, l.Back())
+
+		// Попытка удалить из пустого списка
+		l.Remove(nil)
+		l.MoveToFront(nil)
+		require.Equal(t, 0, l.Len())
 	})
 
 	t.Run("complex", func(t *testing.T) {
@@ -41,11 +46,60 @@ func TestList(t *testing.T) {
 
 		l.MoveToFront(l.Front()) // [80, 60, 40, 10, 30, 50, 70]
 		l.MoveToFront(l.Back())  // [70, 80, 60, 40, 10, 30, 50]
+		// Дополнительная проверка
+		item90 := l.PushBack(90)   // [70, 80, 60, 40, 10, 30, 50, 90]
+		item100 := l.PushBack(100) // [70, 80, 60, 40, 10, 30, 50, 90, 100]
+		l.PushBack(101)            // [70, 80, 60, 40, 10, 30, 50, 90, 100, 101]
+		l.MoveToFront(item90)      // [90, 70, 80, 60, 40, 10, 30, 50, 100, 101]
+		l.PushFront(102)           // [102, 90, 70, 80, 60, 40, 10, 30, 50, 100, 101]
+		l.PushBack(103)            // [102, 90, 70, 80, 60, 40, 10, 30, 50, 100, 101, 103]
+		l.MoveToFront(item100)     // [100, 102, 90, 70, 80, 60, 40, 10, 30, 50, 101, 103]
 
 		elems := make([]int, 0, l.Len())
 		for i := l.Front(); i != nil; i = i.Next {
 			elems = append(elems, i.Value.(int))
 		}
-		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
+		// require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
+		// Дополненный тест.
+		require.Equal(t, []int{100, 102, 90, 70, 80, 60, 40, 10, 30, 50, 101, 103}, elems)
+	})
+
+	// Операции с одним элементом.
+	t.Run("one element", func(t *testing.T) {
+		l := NewList()
+
+		item := l.PushFront(10)
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, item, l.Front())
+		require.Equal(t, item, l.Back())
+
+		l.MoveToFront(item)
+		require.Equal(t, item, l.Front())
+		require.Equal(t, item, l.Back())
+
+		l.Remove(item)
+		require.Equal(t, 0, l.Len())
+		require.Nil(t, l.Front())
+		require.Nil(t, l.Back())
+
+		item = l.PushFront(nil)
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, item, l.Front())
+		require.Equal(t, item, l.Back())
+
+		l.Remove(item)
+		require.Equal(t, 0, l.Len())
+		require.Nil(t, l.Front())
+		require.Nil(t, l.Back())
+
+		item = l.PushBack(nil)
+		require.Equal(t, 1, l.Len())
+		require.Equal(t, item, l.Front())
+		require.Equal(t, item, l.Back())
+
+		l.Remove(item)
+		require.Equal(t, 0, l.Len())
+		require.Nil(t, l.Front())
+		require.Nil(t, l.Back())
 	})
 }
