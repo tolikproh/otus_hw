@@ -75,6 +75,18 @@ func TestCache(t *testing.T) {
 		require.False(t, ok)
 	})
 
+	// Тест на кэш с нулевой емкостью.
+	t.Run("null capacity", func(t *testing.T) {
+		c := NewCache(0)
+
+		c.Set("a", 1)
+		c.Set("b", 2)
+		c.Set("c", 3)
+
+		_, ok := c.Get("a")
+		require.False(t, ok)
+	})
+
 	// Дополнительный тест на очистку кэша.
 	t.Run("clear", func(t *testing.T) {
 		c := NewCache(5)

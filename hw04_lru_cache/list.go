@@ -1,7 +1,5 @@
 package hw04lrucache
 
-import "sync"
-
 type List interface {
 	Len() int
 	Front() *ListItem
@@ -20,10 +18,9 @@ type ListItem struct {
 
 // Структура списка.
 type list struct {
-	length int          // Длина списка
-	front  *ListItem    // Указатель на первый элемент списка
-	back   *ListItem    // Указатель на последний элемент списка
-	mutex  sync.RWMutex // Для горутино-безопасности
+	length int       // Длина списка
+	front  *ListItem // Указатель на первый элемент списка
+	back   *ListItem // Указатель на последний элемент списка
 }
 
 // Создание списка.
@@ -49,29 +46,21 @@ func (l *list) newItem(v interface{}) (*ListItem, bool) {
 
 // Возврат длины списка.
 func (l *list) Len() int {
-	l.mutex.RLock()
-	defer l.mutex.RUnlock()
 	return l.length
 }
 
 // Возвращение первого элемента списка.
 func (l *list) Front() *ListItem {
-	l.mutex.RLock()
-	defer l.mutex.RUnlock()
 	return l.front
 }
 
 // Возвращение последнего элемента списка.
 func (l *list) Back() *ListItem {
-	l.mutex.RLock()
-	defer l.mutex.RUnlock()
 	return l.back
 }
 
 // Запись данных в начало списка и возврат нового элемента.
 func (l *list) PushFront(v interface{}) *ListItem {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
 	// Создание нового элемента списка.
 	item, ok := l.newItem(v)
 	if ok {
@@ -88,8 +77,6 @@ func (l *list) PushFront(v interface{}) *ListItem {
 
 // Запись данных в конец списка и возврат нового элемента.
 func (l *list) PushBack(v interface{}) *ListItem {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
 	// Создание нового элемента списка.
 	item, ok := l.newItem(v)
 	if ok {
@@ -106,8 +93,6 @@ func (l *list) PushBack(v interface{}) *ListItem {
 
 // Удаление элемента из списка.
 func (l *list) Remove(i *ListItem) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
 	// Проверка на пустой входной параметр
 	if i == nil {
 		return
@@ -153,8 +138,6 @@ func (l *list) Remove(i *ListItem) {
 
 // Перемещение элемента списка в начало.
 func (l *list) MoveToFront(i *ListItem) {
-	l.mutex.Lock()
-	defer l.mutex.Unlock()
 	// Проверка на пустой входной параметр
 	if i == nil {
 		return

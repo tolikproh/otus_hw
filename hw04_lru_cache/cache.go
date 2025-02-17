@@ -37,6 +37,11 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
+	// Если емкость кэша 0 или меньше то выходим
+	if c.capacity <= 0 {
+		return false
+	}
+
 	// Проверяем существующий элемент.
 	// Обновляем значение и перемещаем в начало.
 	if item, exists := c.items[key]; exists {
