@@ -15,6 +15,10 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 		return out
 	}
 
+	if stages == nil {
+		return in
+	}
+
 	res := in
 
 	for _, stage := range stages {
@@ -28,7 +32,12 @@ func chanStage(in In, done In) Bi {
 	chanStage := make(Bi)
 
 	go func() {
-		defer close(chanStage)
+		defer func() {
+			close(chanStage)
+			//nolint:revive
+			for range in {
+			}
+		}()
 
 		for {
 			select {
