@@ -17,7 +17,8 @@ func TestCopy(t *testing.T) {
 		})
 		err := Copy(pathFrom, pathTo, 0, 0)
 		require.Error(t, err)
-		require.True(t, errors.Is(err, os.ErrNotExist), "Ожидается ошибка os.ErrNotExist, получена: %v", err)
+		require.True(t, errors.Is(err, os.ErrNotExist),
+			"Ожидается ошибка os.ErrNotExist, получена: %v", err)
 	})
 
 	t.Run("file size null", func(t *testing.T) {
@@ -30,7 +31,8 @@ func TestCopy(t *testing.T) {
 
 		err := Copy(pathFrom, pathTo, 0, 0)
 		require.Error(t, err)
-		require.True(t, errors.Is(err, ErrUnsupportedFile), "Ожидается ошибка ErrUnsupportedFile, получина: %v", err)
+		require.True(t, errors.Is(err, ErrUnsupportedFile),
+			"Ожидается ошибка ErrUnsupportedFile, получина: %v", err)
 	})
 
 	t.Run("offset is not valid", func(t *testing.T) {
@@ -51,6 +53,7 @@ func TestCopy(t *testing.T) {
 
 		err = Copy(pathFrom, pathTo, offset, 0)
 		require.Error(t, err)
-		require.True(t, errors.Is(err, ErrOffsetExceedsFileSize), "Ожидается ошибка ErrOffsetExceedsFileSize, получена: %v", err)
+		require.True(t, errors.Is(err, ErrOffsetExceedsFileSize),
+			"Ожидается ошибка ErrOffsetExceedsFileSize, получена: %v", err)
 	})
 }
