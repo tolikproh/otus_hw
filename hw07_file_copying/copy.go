@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	pb "github.com/cheggaaa/pb/v3"
+	"github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -55,17 +55,15 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	defer destFile.Close()
 
 	progressBar := pb.Full.Start64(limit)
-	sourceFileProgress := progressBar.NewProxyReader(sourceFile)
+	defer progressBar.Finish()
 
-	_, err = io.CopyN(destFile, sourceFileProgress, limit)
-	if err != nil {
+	sourceFileProgress := progressBar.NewProxyReader(sourceFile)
+	if _, err = io.CopyN(destFile, sourceFileProgress, limit); err != nil {
 		if errors.Is(err, io.EOF) {
 			return nil
 		}
 		return err
 	}
-
-	progressBar.Finish()
 
 	return nil
 }
