@@ -56,4 +56,24 @@ func TestCopy(t *testing.T) {
 		require.True(t, errors.Is(err, ErrOffsetExceedsFileSize),
 			"Ожидается ошибка ErrOffsetExceedsFileSize, получена: %v", err)
 	})
+
+	t.Run("invalid filename", func(t *testing.T) {
+		pathFrom := "testdata/input.txt"
+		pathTo := "./testdata/input.txt"
+
+		err := Copy(pathFrom, pathTo, 0, 0)
+		require.Error(t, err)
+		require.True(t, errors.Is(err, ErrIncorrectFileName),
+			"Ожидается ошибка ErrIncorrectFileName, получена: %v", err)
+	})
+
+	t.Run("empty file or path", func(t *testing.T) {
+		pathFrom := ""
+		pathTo := ""
+
+		err := Copy(pathFrom, pathTo, 0, 0)
+		require.Error(t, err)
+		require.True(t, errors.Is(err, ErrEmptyFilePath),
+			"Ожидается ошибка ErrEmptyFilePath, получена: %v", err)
+	})
 }
