@@ -41,12 +41,11 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	if err != nil {
 		return err
 	}
-
-	sourceFileSize := sourceFileInfo.Size()
-	if sourceFileSize == 0 {
+	if !sourceFileInfo.Mode().IsRegular() {
 		return ErrUnsupportedFile
 	}
 
+	sourceFileSize := sourceFileInfo.Size()
 	if offset > sourceFileSize {
 		return ErrOffsetExceedsFileSize
 	}
