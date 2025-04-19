@@ -1,5 +1,14 @@
 package hw09structvalidator
 
+import (
+	"errors"
+	"fmt"
+	"reflect"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
 type ValidationError struct {
 	Field string
 	Err   error
@@ -8,10 +17,171 @@ type ValidationError struct {
 type ValidationErrors []ValidationError
 
 func (v ValidationErrors) Error() string {
-	panic("implement me")
+	errs := make([]string, len(v))
+	for i, err := range v {
+		errs[i] = fmt.Sprintf("%s: %s", err.Field, err.Err)
+	}
+
+	return strings.Join(errs, ", ")
 }
 
+var (
+	ErrIsNotStruct       = errors.New("отсутствует структура")
+	ErrNoNameAndValueTag = errors.New("нет имени и значения в теге")
+
+	ErrLength   = errors.New("длина строки не равна")
+	ErrRegExp   = errors.New("регулярное выражение не совпадает")
+	ErrStrNotIn = errors.New("строка должна входить в множество строк")
+	ErrMin      = errors.New("число не может быть меньше")
+	ErrMax      = errors.New("число не может быть больше")
+	ErrIntNotIn = errors.New("число должно входить в множество чисел")
+)
+
 func Validate(v interface{}) error {
-	// Place your code here.
+	refValue := reflect.ValueOf(v)
+	refType := reflect.TypeOf(v)
+
+	if refValue.Kind() != reflect.Struct {
+		return ErrIsNotStruct
+	}
+
+	var errs ValidationErrors
+
+	for i := 0; i < refType.NumField(); i++ {
+		field := refValue.Type().Field(i)
+		fieldValue := refValue.Field(i)
+		tag := field.Tag.Get("validate")
+
+		if tag == "" {
+			continue
+		}
+
+		rules := strings.Split(tag, "|")
+		for _, rule := range rules {
+			err := validStruct(fieldValue, rule)
+			if err != nil {
+				errs = append(errs, ValidationError{
+					Field: field.Name,
+					Err:   err,
+				})
+			}
+		}
+	}
+
+	if len(errs) > 0 {
+		return errs
+	}
+
+	return nil
+}
+
+func validStruct(field reflect.Value, tag string) error {
+	parts := strings.Split(tag, ":")
+	if len(parts) != 2 {
+		return ErrNoNameAndValueTag
+	}
+	ruleType, ruleVal := parts[0], parts[1]
+
+	kind := field.Kind()
+
+	if kind == reflect.String {
+		return validString(field, ruleType, ruleVal)
+	}
+
+	if kind == reflect.Int {
+		return validInt(field, ruleType, ruleVal)
+	}
+
+	if kind == reflect.Slice {
+		return validSlice(field, tag)
+	}
+
+	return nil
+}
+
+func validString(field reflect.Value, ruleType, ruleVal string) error {
+	value := field.String()
+	switch ruleType {
+	case "len":
+		expectedLen, err := strconv.Atoi(ruleVal)
+		if err != nil {
+			return err
+		}
+
+		if len(value) != expectedLen {
+			return ErrLength
+		}
+	case "regexp":
+		regex, err := regexp.Compile(ruleVal)
+		if err != nil {
+			return err
+		}
+
+		if !regex.MatchString(value) {
+			return ErrRegExp
+		}
+	case "in":
+		vals := strings.Split(ruleVal, ",")
+		for _, val := range vals {
+			if value == val {
+				return nil
+			}
+		}
+
+		return ErrStrNotIn
+	}
+
+	return nil
+}
+
+func validInt(field reflect.Value, ruleType, ruleVal string) error {
+	value := int(field.Int())
+
+	switch ruleType {
+	case "min":
+		minVal, err := strconv.Atoi(ruleVal)
+		if err != nil {
+			return err
+		}
+
+		if value < minVal {
+			return ErrMin
+		}
+	case "max":
+		maxVal, err := strconv.Atoi(ruleVal)
+		if err != nil {
+			return err
+		}
+
+		if value > maxVal {
+			return ErrMax
+		}
+	case "in":
+		nums := strings.Split(ruleVal, ",")
+		for _, num := range nums {
+			num, err := strconv.Atoi(num)
+			if err != nil {
+				return err
+			}
+
+			if num == value {
+				return nil
+			}
+		}
+
+		return ErrIntNotIn
+	}
+
+	return nil
+}
+
+func validSlice(field reflect.Value, tag string) error {
+	for i := 0; i < field.Len(); i++ {
+		err := validStruct(field.Index(i), tag)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
