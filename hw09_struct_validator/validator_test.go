@@ -55,23 +55,23 @@ func TestValidate(t *testing.T) {
 			expectedErr: ValidationErrors{
 				ValidationError{
 					Field: "ID",
-					Err:   ErrLength,
+					Err:   ErrValidLength,
 				},
 				ValidationError{
 					Field: "Age",
-					Err:   ErrMax,
+					Err:   ErrValidMax,
 				},
 				ValidationError{
 					Field: "Email",
-					Err:   ErrRegExp,
+					Err:   ErrValidRegExp,
 				},
 				ValidationError{
 					Field: "Role",
-					Err:   ErrStrNotIn,
+					Err:   ErrValidStrNotIn,
 				},
 				ValidationError{
 					Field: "Phones",
-					Err:   ErrLength,
+					Err:   ErrValidLength,
 				},
 			},
 		},
@@ -94,7 +94,7 @@ func TestValidate(t *testing.T) {
 			expectedErr: ValidationErrors{
 				ValidationError{
 					Field: "Version",
-					Err:   ErrLength,
+					Err:   ErrValidLength,
 				},
 			},
 		},
@@ -130,7 +130,7 @@ func TestValidate(t *testing.T) {
 			expectedErr: ValidationErrors{
 				ValidationError{
 					Field: "Code",
-					Err:   ErrIntNotIn,
+					Err:   ErrValidIntNotIn,
 				},
 			},
 		},

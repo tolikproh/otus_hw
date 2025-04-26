@@ -19,22 +19,28 @@ type ValidationErrors []ValidationError
 func (v ValidationErrors) Error() string {
 	errs := make([]string, len(v))
 	for i, err := range v {
-		errs[i] = fmt.Sprintf("%s: %s", err.Field, err.Err)
+		if errors.Is(err.Err, ErrValidLength) ||
+			errors.Is(err.Err, ErrValidRegExp) ||
+			errors.Is(err.Err, ErrValidStrNotIn) ||
+			errors.Is(err.Err, ErrValidMin) ||
+			errors.Is(err.Err, ErrValidMax) ||
+			errors.Is(err.Err, ErrValidIntNotIn) {
+			errs[i] = fmt.Sprintf("%s: %s", err.Field, err.Err)
+		}
 	}
 
 	return strings.Join(errs, ", ")
 }
 
 var (
-	ErrIsNotStruct       = errors.New("отсутствует структура")
-	ErrNoNameAndValueTag = errors.New("нет имени и значения в теге")
+	ErrIsNotStruct = errors.New("отсутствует структура")
 
-	ErrLength   = errors.New("длина строки не равна")
-	ErrRegExp   = errors.New("регулярное выражение не совпадает")
-	ErrStrNotIn = errors.New("строка должна входить в множество строк")
-	ErrMin      = errors.New("число не может быть меньше")
-	ErrMax      = errors.New("число не может быть больше")
-	ErrIntNotIn = errors.New("число должно входить в множество чисел")
+	ErrValidLength   = errors.New("длина строки не равна")
+	ErrValidRegExp   = errors.New("регулярное выражение не совпадает")
+	ErrValidStrNotIn = errors.New("строка должна входить в множество строк")
+	ErrValidMin      = errors.New("число не может быть меньше")
+	ErrValidMax      = errors.New("число не может быть больше")
+	ErrValidIntNotIn = errors.New("число должно входить в множество чисел")
 )
 
 func Validate(v interface{}) error {
@@ -78,25 +84,20 @@ func Validate(v interface{}) error {
 func validStruct(field reflect.Value, tag string) error {
 	parts := strings.Split(tag, ":")
 	if len(parts) != 2 {
-		return ErrNoNameAndValueTag
+		return nil
 	}
 	ruleType, ruleVal := parts[0], parts[1]
 
-	kind := field.Kind()
-
-	if kind == reflect.String {
+	switch field.Kind() { //nolint:exhaustive
+	case reflect.String:
 		return validString(field, ruleType, ruleVal)
-	}
-
-	if kind == reflect.Int {
+	case reflect.Int:
 		return validInt(field, ruleType, ruleVal)
-	}
-
-	if kind == reflect.Slice {
+	case reflect.Slice:
 		return validSlice(field, tag)
+	default:
+		return nil
 	}
-
-	return nil
 }
 
 func validString(field reflect.Value, ruleType, ruleVal string) error {
@@ -105,20 +106,20 @@ func validString(field reflect.Value, ruleType, ruleVal string) error {
 	case "len":
 		expectedLen, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return err
+			return ErrValidLength
 		}
 
 		if len(value) != expectedLen {
-			return ErrLength
+			return ErrValidLength
 		}
 	case "regexp":
 		regex, err := regexp.Compile(ruleVal)
 		if err != nil {
-			return err
+			return ErrValidRegExp
 		}
 
 		if !regex.MatchString(value) {
-			return ErrRegExp
+			return ErrValidRegExp
 		}
 	case "in":
 		vals := strings.Split(ruleVal, ",")
@@ -128,7 +129,7 @@ func validString(field reflect.Value, ruleType, ruleVal string) error {
 			}
 		}
 
-		return ErrStrNotIn
+		return ErrValidStrNotIn
 	}
 
 	return nil
@@ -141,27 +142,27 @@ func validInt(field reflect.Value, ruleType, ruleVal string) error {
 	case "min":
 		minVal, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return err
+			return ErrValidMin
 		}
 
 		if value < minVal {
-			return ErrMin
+			return ErrValidMin
 		}
 	case "max":
 		maxVal, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return err
+			return ErrValidMax
 		}
 
 		if value > maxVal {
-			return ErrMax
+			return ErrValidMax
 		}
 	case "in":
 		nums := strings.Split(ruleVal, ",")
 		for _, num := range nums {
 			num, err := strconv.Atoi(num)
 			if err != nil {
-				return err
+				return ErrValidIntNotIn
 			}
 
 			if num == value {
@@ -169,7 +170,7 @@ func validInt(field reflect.Value, ruleType, ruleVal string) error {
 			}
 		}
 
-		return ErrIntNotIn
+		return ErrValidIntNotIn
 	}
 
 	return nil
