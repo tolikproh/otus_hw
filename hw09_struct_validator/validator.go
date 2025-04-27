@@ -19,14 +19,7 @@ type ValidationErrors []ValidationError
 func (v ValidationErrors) Error() string {
 	errs := make([]string, len(v))
 	for i, err := range v {
-		if errors.Is(err.Err, ErrValidLength) ||
-			errors.Is(err.Err, ErrValidRegExp) ||
-			errors.Is(err.Err, ErrValidStrNotIn) ||
-			errors.Is(err.Err, ErrValidMin) ||
-			errors.Is(err.Err, ErrValidMax) ||
-			errors.Is(err.Err, ErrValidIntNotIn) {
-			errs[i] = fmt.Sprintf("%s: %s", err.Field, err.Err)
-		}
+		errs[i] = fmt.Sprintf("%s: %s", err.Field, err.Err)
 	}
 
 	return strings.Join(errs, ", ")
@@ -42,6 +35,18 @@ var (
 	ErrValidMax      = errors.New("число не может быть больше")
 	ErrValidIntNotIn = errors.New("число должно входить в множество чисел")
 )
+
+func isErrValid(err error) bool {
+	if errors.Is(err, ErrValidLength) ||
+		errors.Is(err, ErrValidRegExp) ||
+		errors.Is(err, ErrValidStrNotIn) ||
+		errors.Is(err, ErrValidMin) ||
+		errors.Is(err, ErrValidMax) ||
+		errors.Is(err, ErrValidIntNotIn) {
+		return true
+	}
+	return false
+}
 
 func Validate(v interface{}) error {
 	refValue := reflect.ValueOf(v)
@@ -66,6 +71,9 @@ func Validate(v interface{}) error {
 		for _, rule := range rules {
 			err := validStruct(fieldValue, rule)
 			if err != nil {
+				if !isErrValid(err) {
+					return err
+				}
 				errs = append(errs, ValidationError{
 					Field: field.Name,
 					Err:   err,
@@ -106,7 +114,7 @@ func validString(field reflect.Value, ruleType, ruleVal string) error {
 	case "len":
 		expectedLen, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return ErrValidLength
+			return err
 		}
 
 		if len(value) != expectedLen {
@@ -115,7 +123,7 @@ func validString(field reflect.Value, ruleType, ruleVal string) error {
 	case "regexp":
 		regex, err := regexp.Compile(ruleVal)
 		if err != nil {
-			return ErrValidRegExp
+			return err
 		}
 
 		if !regex.MatchString(value) {
@@ -142,7 +150,7 @@ func validInt(field reflect.Value, ruleType, ruleVal string) error {
 	case "min":
 		minVal, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return ErrValidMin
+			return err
 		}
 
 		if value < minVal {
@@ -151,7 +159,7 @@ func validInt(field reflect.Value, ruleType, ruleVal string) error {
 	case "max":
 		maxVal, err := strconv.Atoi(ruleVal)
 		if err != nil {
-			return ErrValidMax
+			return err
 		}
 
 		if value > maxVal {
@@ -162,7 +170,7 @@ func validInt(field reflect.Value, ruleType, ruleVal string) error {
 		for _, num := range nums {
 			num, err := strconv.Atoi(num)
 			if err != nil {
-				return ErrValidIntNotIn
+				return err
 			}
 
 			if num == value {
