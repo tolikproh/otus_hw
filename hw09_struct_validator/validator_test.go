@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 type UserRole string
@@ -42,10 +44,103 @@ func TestValidate(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			// Place your code here.
+			in: User{
+				ID:     "123",
+				Name:   "name",
+				Age:    123,
+				Email:  "test",
+				Role:   "test",
+				Phones: []string{"123"},
+			},
+			expectedErr: ValidationErrors{
+				ValidationError{
+					Field: "ID",
+					Err:   ErrValidLength,
+				},
+				ValidationError{
+					Field: "Age",
+					Err:   ErrValidMax,
+				},
+				ValidationError{
+					Field: "Email",
+					Err:   ErrValidRegExp,
+				},
+				ValidationError{
+					Field: "Role",
+					Err:   ErrValidStrNotIn,
+				},
+				ValidationError{
+					Field: "Phones",
+					Err:   ErrValidLength,
+				},
+			},
 		},
-		// ...
-		// Place your code here.
+		{
+			in: User{
+				ID:     "58bd82c8-918c-4812-8601-50491dd555e7",
+				Name:   "test",
+				Age:    32,
+				Email:  "t@test.ru",
+				Role:   "admin",
+				Phones: []string{"89261234567"},
+			},
+			expectedErr: nil,
+		},
+
+		{
+			in: App{
+				Version: "5",
+			},
+			expectedErr: ValidationErrors{
+				ValidationError{
+					Field: "Version",
+					Err:   ErrValidLength,
+				},
+			},
+		},
+		{
+			in: App{
+				Version: "12345",
+			},
+			expectedErr: nil,
+		},
+
+		{
+			in: Token{
+				Header:    nil,
+				Payload:   nil,
+				Signature: nil,
+			},
+			expectedErr: nil,
+		},
+		{
+			in: Token{
+				Header:    []byte("application: text/json"),
+				Payload:   []byte("status: 200"),
+				Signature: []byte("signature"),
+			},
+			expectedErr: nil,
+		},
+
+		{
+			in: Response{
+				Code: 100,
+				Body: "",
+			},
+			expectedErr: ValidationErrors{
+				ValidationError{
+					Field: "Code",
+					Err:   ErrValidIntNotIn,
+				},
+			},
+		},
+		{
+			in: Response{
+				Code: 200,
+				Body: "",
+			},
+			expectedErr: nil,
+		},
 	}
 
 	for i, tt := range tests {
@@ -53,8 +148,47 @@ func TestValidate(t *testing.T) {
 			tt := tt
 			t.Parallel()
 
-			// Place your code here.
-			_ = tt
+			err := Validate(tt.in)
+			require.Equal(t, tt.expectedErr, err)
+		})
+	}
+}
+
+type AtoiError struct {
+	Test string `validate:"len:error"`
+}
+
+type RegExtError struct {
+	Test string `validate:"regexp:]["`
+}
+
+func TestSytstemError(t *testing.T) {
+	testCase := []struct {
+		name string
+		in   interface{}
+	}{
+		{
+			name: "No struct",
+			in:   123,
+		},
+		{
+			name: "Atoi error",
+			in: AtoiError{
+				Test: "0123",
+			},
+		},
+		{
+			name: "RegExt error",
+			in: RegExtError{
+				Test: "0123",
+			},
+		},
+	}
+
+	for _, tc := range testCase {
+		t.Run(tc.name, func(t *testing.T) {
+			err := Validate(tc.in)
+			require.Error(t, err)
 		})
 	}
 }
