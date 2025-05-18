@@ -1,5 +1,14 @@
-[logger]
-level = "INFO"
+httpserver:
+    host: localhost
+    port: 8000
 
-# TODO
-# ...
+logger:
+    # level: info, debug, warn, error
+    level: debug
+
+storage:
+    # type: memory, postgres
+    type: memory
+    conn: postgres://calendar:calendar@localhost:5432/calendar_db?sslmode=disable
+    
+    

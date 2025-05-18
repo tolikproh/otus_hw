@@ -2,30 +2,57 @@ package internalhttp
 
 import (
 	"context"
+	"net"
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/app"
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/config"
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/logger"
 )
 
-type Server struct { // TODO
+type Server struct {
+	app *app.App
+	log *logger.Logger
+	cfg *config.Config
+	srv *http.Server
 }
 
-type Logger interface { // TODO
-}
+func NewServer(cfg *config.Config, log *logger.Logger, app *app.App) *Server {
+	srv := &http.Server{
+		Addr:         net.JoinHostPort(cfg.HTTPServer.Host, strconv.Itoa(cfg.HTTPServer.Port)),
+		Handler:      route(log),
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+	}
 
-type Application interface { // TODO
-}
-
-func NewServer(logger Logger, app Application) *Server {
-	return &Server{}
+	return &Server{cfg: cfg, log: log, app: app, srv: srv}
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	// TODO
-	<-ctx.Done()
-	return nil
+	s.log.Debug("set loger level: " + s.cfg.Logger.Level)
+	s.log.Debug("set storage type: " + s.cfg.Storage.Type)
+	s.log.Debug("storage connection: " + s.cfg.Storage.Conn)
+
+	s.log.Info("http server started", "address", s.srv.Addr)
+	return s.srv.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {
-	// TODO
-	return nil
+	s.log.Debug("http server is shutting down...")
+	return s.srv.Shutdown(ctx)
 }
 
-// TODO
+func route(log *logger.Logger) http.Handler {
+	mux := http.NewServeMux()
+
+	mux.Handle("/", http.HandlerFunc(homeHandler))
+	mux.Handle("/hello", http.HandlerFunc(helloHandler))
+
+	var handler http.Handler = mux
+	handler = loggingMiddleware(log, handler)
+
+	return handler
+}
