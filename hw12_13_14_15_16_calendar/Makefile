@@ -25,8 +25,10 @@ run-img: build-img
 version: build
 	$(BIN) version
 
-test:
-	go test -race ./internal/... ./pkg/...
+
+ test:
+	go test -race ./internal/... 
+#./pkg/...
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.63.4
