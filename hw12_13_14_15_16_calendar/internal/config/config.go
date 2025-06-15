@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	HTTPServer `yaml:"httpserver"`
+	GRPCServer `yaml:"grpcserver"`
 	Logger     `yaml:"logger"`
 	Storage    `yaml:"storage"`
 }
@@ -17,6 +18,11 @@ type Config struct {
 type HTTPServer struct {
 	Host string `yaml:"host" env:"CALENDAR_HTTP_SERVER_HOST"`
 	Port int    `yaml:"port" env:"CALENDAR_HTTP_SERVER_PORT"`
+}
+
+type GRPCServer struct {
+	Host string `yaml:"host" env:"CALENDAR_GRPC_SERVER_HOST"`
+	Port int    `yaml:"port" env:"CALENDAR_GRPC_SERVER_PORT"`
 }
 
 type Logger struct {
@@ -29,10 +35,15 @@ type Storage struct {
 }
 
 func defaultConfig() *Config {
-	var cfg Config
+	cfg := new(Config)
+
 	// Http Server
-	cfg.HTTPServer.Host = "example.com"
+	cfg.HTTPServer.Host = "localhost"
 	cfg.HTTPServer.Port = 8080
+
+	// GRPC Server
+	cfg.GRPCServer.Host = "localhost"
+	cfg.GRPCServer.Port = 5000
 
 	// Logger
 	cfg.Logger.Level = cnst.LoggerLevelInfo
@@ -41,7 +52,7 @@ func defaultConfig() *Config {
 	cfg.Storage.Type = cnst.StorageTypeMemory
 	cfg.Storage.Conn = ""
 
-	return &cfg
+	return cfg
 }
 
 // NewConfig Set Default.

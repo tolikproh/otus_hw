@@ -19,10 +19,9 @@ type Server struct {
 	srv *http.Server
 }
 
-func NewServer(cfg *config.Config, log *logger.Logger, app *app.App) *Server {
+func New(cfg *config.Config, log *logger.Logger, app *app.App) *Server {
 	srv := &http.Server{
 		Addr:         net.JoinHostPort(cfg.HTTPServer.Host, strconv.Itoa(cfg.HTTPServer.Port)),
-		Handler:      route(log),
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -32,27 +31,13 @@ func NewServer(cfg *config.Config, log *logger.Logger, app *app.App) *Server {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	s.log.Debug("set loger level: " + s.cfg.Logger.Level)
-	s.log.Debug("set storage type: " + s.cfg.Storage.Type)
-	s.log.Debug("storage connection: " + s.cfg.Storage.Conn)
-
 	s.log.Info("http server started", "address", s.srv.Addr)
+
+	s.srv.Handler = s.initRoute()
 	return s.srv.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {
 	s.log.Debug("http server is shutting down...")
 	return s.srv.Shutdown(ctx)
-}
-
-func route(log *logger.Logger) http.Handler {
-	mux := http.NewServeMux()
-
-	mux.Handle("/", http.HandlerFunc(homeHandler))
-	mux.Handle("/hello", http.HandlerFunc(helloHandler))
-
-	var handler http.Handler = mux
-	handler = loggingMiddleware(log, handler)
-
-	return handler
 }

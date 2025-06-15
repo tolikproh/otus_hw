@@ -2,13 +2,18 @@ httpserver:
     host: localhost
     port: 8000
 
+grpcserver:
+    host: localhost
+    port: 5001
+
+
 logger:
     # level: info, debug, warn, error
     level: debug
 
 storage:
-    # type: memory, postgres
-    type: memory
-    conn: postgres://calendar:calendar@localhost:5432/calendar_db?sslmode=disable
+    #type: memory
+    type: postgres
+    conn: postgres://calendar:CalendarPswd@127.0.0.1:5417/calendar_db?sslmode=disable
     
     

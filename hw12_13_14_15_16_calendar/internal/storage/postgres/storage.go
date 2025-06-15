@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"time"
 
-	_ "github.com/jackc/pgx"
+	_ "github.com/lib/pq"
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/config"
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/logger"
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/model"
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/pkg/utils"
 )
 
 type Storage struct {
@@ -18,7 +19,7 @@ type Storage struct {
 }
 
 func New(ctx context.Context, cfg *config.Config, log *logger.Logger) (*Storage, error) {
-	db, err := sql.Open("pgx", cfg.Storage.Conn)
+	db, err := sql.Open("postgres", cfg.Storage.Conn)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +41,8 @@ func (s *Storage) Close() error {
 func (s *Storage) CreateEvent(ctx context.Context, event model.Event) (int, error) {
 	args := []interface{}{
 		event.Title,
-		event.DateTimeStart,
-		event.DateTimeEnd,
+		event.DateTimeStart.UTC(),
+		event.DateTimeEnd.UTC(),
 		event.Description,
 		event.UserID,
 		event.NotificationDuration,
@@ -62,8 +63,8 @@ func (s *Storage) CreateEvent(ctx context.Context, event model.Event) (int, erro
 func (s *Storage) UpdateEvent(ctx context.Context, id int, event model.Event) error {
 	args := []interface{}{
 		event.Title,
-		event.DateTimeStart,
-		event.DateTimeEnd,
+		event.DateTimeStart.UTC(),
+		event.DateTimeEnd.UTC(),
 		event.Description,
 		event.UserID,
 		event.NotificationDuration,
@@ -97,8 +98,9 @@ func (s *Storage) DeleteEvent(ctx context.Context, id int) error {
 }
 
 func (s *Storage) DeleteEventsOldThenLastYear(ctx context.Context) error {
-	query := `DELETE FROM event	WHERE date_time_end < date_trunc('minute', now() - interval '1 year')`
-	_, err := s.db.ExecContext(ctx, query)
+	date := utils.GetLastYear(time.Now()).Format("2006-01-02")
+	query := `DELETE FROM event	WHERE date_time_end::date < $1`
+	_, err := s.db.ExecContext(ctx, query, date)
 	if err != nil {
 		return err
 	}
@@ -113,37 +115,34 @@ func (s *Storage) GetEvents(ctx context.Context) ([]model.Event, error) {
 	return s.prepareEvents(ctx, query)
 }
 
-func (s *Storage) GetEventsByLastDay(ctx context.Context, date time.Time) ([]model.Event, error) {
-	query := `SELECT id, title, date_time_start, date_time_end, description, user_id, notification_duration
-			  FROM event
-			  WHERE date_time_end > date_trunc('minute', now() - interval '1 day')
-		      ORDER BY date_time_start`
-	return s.prepareEvents(ctx, query)
+func (s *Storage) GetEventsByDay(ctx context.Context, date time.Time) ([]model.Event, error) {
+	start := utils.GetStartOfDay(date).Format("2006-01-02")
+	end := utils.GetEndOfDay(date).Format("2006-01-02")
+	return s.getEventsByDate(ctx, start, end)
 }
 
-func (s *Storage) GetEventsByLastWeek(ctx context.Context, date time.Time) ([]model.Event, error) {
-	query := `SELECT id, title, date_time_start, date_time_end, description, user_id, notification_duration
-			  FROM event
-			  WHERE date_time_end > date_trunc('minute', now() - interval '1 week')
-		      ORDER BY date_time_start`
-	return s.prepareEvents(ctx, query)
+func (s *Storage) GetEventsByWeek(ctx context.Context, date time.Time) ([]model.Event, error) {
+	start := utils.GetStartOfWeek(date).Format("2006-01-02")
+	end := utils.GetEndOfWeek(date).Format("2006-01-02")
+	return s.getEventsByDate(ctx, start, end)
 }
 
-func (s *Storage) GetEventsByLastMonth(ctx context.Context, date time.Time) ([]model.Event, error) {
-	query := `SELECT id, title, date_time_start, date_time_end, description, user_id, notification_duration
-			  FROM event
-			  WHERE date_time_end > date_trunc('minute', now() - interval '1 month')
-		      ORDER BY date_time_start`
-	return s.prepareEvents(ctx, query)
+func (s *Storage) GetEventsByMonth(ctx context.Context, date time.Time) ([]model.Event, error) {
+	start := utils.GetStartOfMonth(date).Format("2006-01-02")
+	end := utils.GetEndOfMonth(date).Format("2006-01-02")
+	return s.getEventsByDate(ctx, start, end)
 }
 
-func (s *Storage) prepareEvents(ctx context.Context, query string) ([]model.Event, error) {
-	_, err := s.db.ExecContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
+func (s *Storage) getEventsByDate(ctx context.Context, args ...any) ([]model.Event, error) {
+	query := `SELECT id, title, date_time_start, date_time_end, description, user_id, notification_duration
+		 	  FROM event 
+		      WHERE date_time_end::date BETWEEN $1 AND $2
+		      ORDER BY date_time_start`
+	return s.prepareEvents(ctx, query, args...)
+}
 
-	rows, err := s.db.QueryContext(ctx, query)
+func (s *Storage) prepareEvents(ctx context.Context, query string, args ...any) ([]model.Event, error) {
+	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

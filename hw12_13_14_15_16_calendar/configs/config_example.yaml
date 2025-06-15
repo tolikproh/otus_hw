@@ -2,6 +2,10 @@ httpserver:
     host: calendar.ru
     port: 8000
 
+grpcserver:
+    host: calendar.ru
+    port: 5001
+
 logger:
     # level: info, debug, warn, error
     level: error

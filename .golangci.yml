@@ -23,6 +23,8 @@ linters-settings:
           - github.com/spf13/viper
           - github.com/spf13/cobra
           - github.com/jackc/pgx
+          - github.com/lib/pq
+          - google.golang.org
       Test:
         files:
           - $test
@@ -30,6 +32,7 @@ linters-settings:
           - $gostd
           - github.com/stretchr/testify
           - github.com/tolikproh/otus_hw
+          - google.golang.org
   revive:
     rules:
       - name: unused-parameter

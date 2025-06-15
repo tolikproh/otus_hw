@@ -1,4 +1,4 @@
-package memorystorage
+package mem
 
 import (
 	"context"

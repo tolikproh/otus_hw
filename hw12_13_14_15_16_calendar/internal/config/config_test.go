@@ -23,8 +23,12 @@ func TestConfig(t *testing.T) {
 			env:  map[string]string{},
 			exp: &Config{
 				HTTPServer: HTTPServer{
-					Host: "example.com",
+					Host: "localhost",
 					Port: 8080,
+				},
+				GRPCServer: GRPCServer{
+					Host: "localhost",
+					Port: 5000,
 				},
 				Logger: Logger{
 					Level: cnst.LoggerLevelInfo,
@@ -45,6 +49,10 @@ func TestConfig(t *testing.T) {
 					Host: "calendar.ru",
 					Port: 8000,
 				},
+				GRPCServer: GRPCServer{
+					Host: "calendar.ru",
+					Port: 5001,
+				},
 				Logger: Logger{
 					Level: cnst.LoggerLevelError,
 				},
@@ -61,6 +69,8 @@ func TestConfig(t *testing.T) {
 			env: map[string]string{
 				"CALENDAR_HTTP_SERVER_HOST": "env.net",
 				"CALENDAR_HTTP_SERVER_PORT": "1234",
+				"CALENDAR_GRPC_SERVER_HOST": "env.net",
+				"CALENDAR_GRPC_SERVER_PORT": "5002",
 				"CALENDAR_LOG_LEVEL":        "warn",
 				"CALENDAR_STORAGE_TYPE":     "memory",
 				"CALENDAR_STORAGE_CONN":     "http://memory.com",
@@ -69,6 +79,10 @@ func TestConfig(t *testing.T) {
 				HTTPServer: HTTPServer{
 					Host: "env.net",
 					Port: 1234,
+				},
+				GRPCServer: GRPCServer{
+					Host: "env.net",
+					Port: 5002,
 				},
 				Logger: Logger{
 					Level: cnst.LoggerLevelWarn,
@@ -90,6 +104,10 @@ func TestConfig(t *testing.T) {
 				HTTPServer: HTTPServer{
 					Host: "calendar.ru",
 					Port: 8000,
+				},
+				GRPCServer: GRPCServer{
+					Host: "calendar.ru",
+					Port: 5001,
 				},
 				Logger: Logger{
 					Level: cnst.LoggerLevelError,

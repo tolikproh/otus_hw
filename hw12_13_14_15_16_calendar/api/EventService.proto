@@ -1,7 +1,82 @@
 syntax = "proto3";
 
 package event;
+option go_package = "./;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+service Calendar {
+    rpc GetEvents (GetEventsRequest) returns (GetEventsResponse) {
+    }
+    
+    rpc GetEventsByDay (GetEventsRequest) returns (GetEventsResponse) {
+    }
+    
+    rpc GetEventsByWeek (GetEventsRequest) returns (GetEventsResponse) {
+    }
+    
+    rpc GetEventsByMonth (GetEventsRequest) returns (GetEventsResponse) {
+    }
+    
+    rpc CreateEvent (CreateEventRequest) returns (CreateEventResponse) {
+    }
+    
+    rpc UpdateEvent (UpdateEventRequest) returns (UpdateEventResponse) {
+    }
+    
+    rpc DeleteEvent (DeleteEventRequest) returns (DeleteEventResponse) {
+    }
+    
+    rpc DeleteEventsOld (DeleteEventsOldRequest) returns (DeleteEventsOldResponse) {
+    }
+}
 
 message Event {
-    // TODO
+    int32 id = 1;
+    string title = 2;
+    google.protobuf.Timestamp date_time_start = 3;
+    google.protobuf.Timestamp date_time_end = 4;
+    string description = 5;
+    int32 user_id = 6;
+    google.protobuf.Duration notification_duration = 7;
+  }
+  
+message EventRequest {
+    Event event = 1;
 }
+
+// Get Events
+message GetEventsRequest {}
+
+message GetEventsResponse {
+   repeated Event events = 1;
+}
+
+// Create Event
+message CreateEventRequest {
+    EventRequest event = 1;
+}
+
+message CreateEventResponse {
+    int32 id = 1;
+}
+
+// Update Event
+message UpdateEventRequest {
+    EventRequest event = 1;
+}
+
+message UpdateEventResponse {}
+
+// Delete Event
+message DeleteEventRequest {
+    int32 id = 1;
+}
+
+message DeleteEventResponse {}
+
+// Delete Events Old
+message DeleteEventsOldRequest {}
+
+message DeleteEventsOldResponse {}

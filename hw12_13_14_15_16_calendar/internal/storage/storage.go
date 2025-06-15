@@ -9,7 +9,7 @@ import (
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/config"
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/logger"
 	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/model"
-	mem "github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/storage/memory"
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/storage/mem"
 	psql "github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/storage/postgres"
 )
 
@@ -20,9 +20,9 @@ type Storage interface {
 	DeleteEvent(ctx context.Context, id int) error
 	DeleteEventsOldThenLastYear(ctx context.Context) error
 	GetEvents(ctx context.Context) ([]model.Event, error)
-	GetEventsByLastDay(ctx context.Context, date time.Time) ([]model.Event, error)
-	GetEventsByLastWeek(ctx context.Context, date time.Time) ([]model.Event, error)
-	GetEventsByLastMonth(ctx context.Context, date time.Time) ([]model.Event, error)
+	GetEventsByDay(ctx context.Context, date time.Time) ([]model.Event, error)
+	GetEventsByWeek(ctx context.Context, date time.Time) ([]model.Event, error)
+	GetEventsByMonth(ctx context.Context, date time.Time) ([]model.Event, error)
 }
 
 func New(ctx context.Context, cfg *config.Config, log *logger.Logger) (Storage, error) {
