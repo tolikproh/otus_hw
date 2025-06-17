@@ -18,12 +18,26 @@ linters-settings:
           - $gostd
           - github.com/cheggaaa/pb
           - github.com/json-iterator/go
+          - github.com/tolikproh/otus_hw
+          - github.com/ilyakaznacheev/cleanenv
+          - github.com/spf13/viper
+          - github.com/spf13/cobra
+          - github.com/jackc/pgx
+          - github.com/lib/pq
+          - google.golang.org
       Test:
         files:
           - $test
         allow:
           - $gostd
           - github.com/stretchr/testify
+          - github.com/tolikproh/otus_hw
+          - google.golang.org
+  revive:
+    rules:
+      - name: unused-parameter
+        severity: warning
+        disabled: true
 issues:
   exclude-rules:
     - path: _test\.go

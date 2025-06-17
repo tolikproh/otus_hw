@@ -1,20 +1,41 @@
 package logger
 
-import "fmt"
+import (
+	"io"
+	"log/slog"
+	"os"
+	"strings"
 
-type Logger struct { // TODO
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/internal/cnst"
+)
+
+type Logger struct {
+	*slog.Logger
 }
 
 func New(level string) *Logger {
-	return &Logger{}
+	return newLogger(os.Stdout, level)
 }
 
-func (l Logger) Info(msg string) {
-	fmt.Println(msg)
+func newLogger(w io.Writer, level string) *Logger {
+	l := slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{
+		Level: getLogLevel(level),
+	}))
+
+	return &Logger{l}
 }
 
-func (l Logger) Error(msg string) {
-	// TODO
-}
+func getLogLevel(level string) slog.Level {
+	level = strings.ToLower(level)
 
-// TODO
+	switch level {
+	case cnst.LoggerLevelDebug:
+		return slog.LevelDebug // DebugLevel = -4
+	case cnst.LoggerLevelWarn:
+		return slog.LevelWarn // WarnLevel = 4
+	case cnst.LoggerLevelError:
+		return slog.LevelError // ErrorLevel = 8
+	default:
+		return slog.LevelInfo // InfoLevel = 0
+	}
+}

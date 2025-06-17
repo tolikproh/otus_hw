@@ -1,0 +1,18 @@
+httpserver:
+    host: calendar.ru
+    port: 8000
+
+grpcserver:
+    host: calendar.ru
+    port: 5001
+
+logger:
+    # level: info, debug, warn, error
+    level: error
+
+storage:
+    # type: memory, postgres
+    type: postgres
+    # conn: postgres://user:password@localhost:5432/calendar_db?sslmode=disable
+    conn: postgres://user:password@localhost:5432/calendar_db?sslmode=disable
+    

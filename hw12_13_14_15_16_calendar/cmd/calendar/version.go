@@ -4,7 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/spf13/cobra"
 )
+
+var Version = &cobra.Command{
+	Use:   "version",
+	Short: "Version application",
+	Long:  `Version application`,
+	Run: func(cmd *cobra.Command, args []string) {
+		printVersion()
+	},
+}
 
 var (
 	release   = "UNKNOWN"

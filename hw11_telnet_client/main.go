@@ -29,7 +29,6 @@ func main() {
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 
 	addr := net.JoinHostPort(host, port)
 

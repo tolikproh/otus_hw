@@ -1,0 +1,186 @@
+{
+	"info": {
+		"_postman_id": "45fe33dc-1466-455f-b27a-c228e2d099a6",
+		"name": "hw_calendar",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13223079",
+		"_collection_link": "https://galactic-satellite-339022.postman.co/workspace/Team-Workspace~63cc2443-4b68-44b2-895a-c7dfed9e17da/collection/13223079-45fe33dc-1466-455f-b27a-c228e2d099a6?action=share&source=collection_link&creator=13223079"
+	},
+	"item": [
+		{
+			"name": "event list all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event list day",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/day/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						"day",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event list week",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/week/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						"week",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event list month",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/month/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						"month",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Title Postman2\",\n    \"dateTimeStart\": \"2025-06-06T18:00:11.92192Z\",\n    \"dateTimeEnd\": \"2025-06-14T18:00:11.921921Z\",\n    \"description\": \"Test Postman2\",\n    \"userId\": 1,\n    \"notificationDuration\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/event/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 9,\n    \"title\": \"Title Postman Update\",\n    \"dateTimeStart\": \"2025-06-06T14:00:11.92192Z\",\n    \"dateTimeEnd\": \"2025-06-20T18:00:11.921921Z\",\n    \"description\": \"Test Postman Update\",\n    \"userId\": 1,\n    \"notificationDuration\": null\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/event/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/2/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						"2",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "event delete old",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/event/old/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"event",
+						"old",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
