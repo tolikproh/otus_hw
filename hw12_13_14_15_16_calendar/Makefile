@@ -1,7 +1,9 @@
 include .env
 export
 
-BIN := "./bin/calendar"
+BIN_API := "./bin/calendar"
+BIN_SCHEDURLER := "./bin/calendar_scheduler"
+BIN_SENDER := "./bin/calendar_sender"
 DOCKER_IMG="calendar:develop"
 PROTO_DIR="./api"
 GENERATE_DIR="./internal/pb"
@@ -12,7 +14,9 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 .PHONY: build run build-img run-img version test lint generate
 
 build:
-	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(BIN_API) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(BIN_SCHEDURLER) -ldflags "$(LDFLAGS)" ./cmd/calendar_scheduler
+	go build -v -o $(BIN_SENDER) -ldflags "$(LDFLAGS)" ./cmd/calendar_sender
 
 run: build
 	$(BIN) --config ./configs/config.yaml
@@ -28,7 +32,6 @@ run-img: build-img
 
 version: build
 	$(BIN) version
-
 
  test:
 	go test -race ./internal/... ./pkg/...

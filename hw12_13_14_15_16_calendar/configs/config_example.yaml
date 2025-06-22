@@ -15,4 +15,6 @@ storage:
     type: postgres
     # conn: postgres://user:password@localhost:5432/calendar_db?sslmode=disable
     conn: postgres://user:password@localhost:5432/calendar_db?sslmode=disable
-    
+
+rabbitmq:
+    address: amqp://guest:guest@localhost:5672/

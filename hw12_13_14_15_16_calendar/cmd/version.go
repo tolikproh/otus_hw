@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ var Version = &cobra.Command{
 	Short: "Version application",
 	Long:  `Version application`,
 	Run: func(cmd *cobra.Command, args []string) {
-		printVersion()
+		PrintVersion()
 	},
 }
 
@@ -23,7 +23,7 @@ var (
 	gitHash   = "UNKNOWN"
 )
 
-func printVersion() {
+func PrintVersion() {
 	if err := json.NewEncoder(os.Stdout).Encode(struct {
 		Release   string
 		BuildDate string

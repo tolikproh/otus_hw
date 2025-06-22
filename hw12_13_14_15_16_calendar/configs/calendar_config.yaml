@@ -15,5 +15,3 @@ storage:
     #type: memory
     type: postgres
     conn: postgres://calendar:CalendarPswd@127.0.0.1:5417/calendar_db?sslmode=disable
-    
-    
