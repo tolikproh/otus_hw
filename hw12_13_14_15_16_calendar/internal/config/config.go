@@ -13,6 +13,7 @@ type Config struct {
 	GRPCServer `yaml:"grpcserver"`
 	Logger     `yaml:"logger"`
 	Storage    `yaml:"storage"`
+	RabbitMQ   `yaml:"rabbitmq"`
 }
 
 type HTTPServer struct {
@@ -34,6 +35,10 @@ type Storage struct {
 	Conn string `yaml:"conn" env:"CALENDAR_STORAGE_CONN"`
 }
 
+type RabbitMQ struct {
+	Address string `yaml:"address" env:"CALENDAR_RABBITMQ_ADDRESS"`
+}
+
 func defaultConfig() *Config {
 	cfg := new(Config)
 
@@ -51,6 +56,9 @@ func defaultConfig() *Config {
 	// Storage
 	cfg.Storage.Type = cnst.StorageTypeMemory
 	cfg.Storage.Conn = ""
+
+	// Bracker RabbitMQ
+	cfg.RabbitMQ.Address = "amqp://guest:guest@localhost:5672/"
 
 	return cfg
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/tolikproh/otus_hw/hw12_13_14_15_16_calendar/cmd"
 )
 
 var configFile string
@@ -20,8 +21,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(Version)
-	rootCmd.Flags().StringVarP(&configFile, "config", "c", "./configs/config.yaml", "path to configuration file")
+	rootCmd.AddCommand(cmd.Version)
+	rootCmd.Flags().StringVarP(&configFile, "config", "c", "./configs/calendar_config.yaml", "path to configuration file")
 }
 
 func main() {

@@ -37,6 +37,9 @@ func TestConfig(t *testing.T) {
 					Type: cnst.StorageTypeMemory,
 					Conn: "",
 				},
+				RabbitMQ: RabbitMQ{
+					Address: "amqp://guest:guest@localhost:5672/",
+				},
 			},
 		},
 		{
@@ -60,6 +63,9 @@ func TestConfig(t *testing.T) {
 					Type: cnst.StorageTypePostgres,
 					Conn: "postgres://user:password@localhost:5432/calendar_db?sslmode=disable",
 				},
+				RabbitMQ: RabbitMQ{
+					Address: "amqp://test:pswd@127.0.0.1:5561/",
+				},
 			},
 		},
 		{
@@ -74,6 +80,7 @@ func TestConfig(t *testing.T) {
 				"CALENDAR_LOG_LEVEL":        "warn",
 				"CALENDAR_STORAGE_TYPE":     "memory",
 				"CALENDAR_STORAGE_CONN":     "http://memory.com",
+				"CALENDAR_RABBITMQ_ADDRESS": "amqp://env:envpswd@localhost:4321/",
 			},
 			exp: &Config{
 				HTTPServer: HTTPServer{
@@ -91,6 +98,9 @@ func TestConfig(t *testing.T) {
 					Type: cnst.StorageTypeMemory,
 					Conn: "http://memory.com",
 				},
+				RabbitMQ: RabbitMQ{
+					Address: "amqp://env:envpswd@localhost:4321/",
+				},
 			},
 		},
 		{
@@ -98,7 +108,8 @@ func TestConfig(t *testing.T) {
 			path: "./testdata",
 			file: "config_test.yaml",
 			env: map[string]string{
-				"CALENDAR_STORAGE_CONN": "postgres://user:secret@localhost:5555",
+				"CALENDAR_STORAGE_CONN":     "postgres://user:secret@localhost:5555",
+				"CALENDAR_RABBITMQ_ADDRESS": "amqp://env:envpswd@localhost:5678/",
 			},
 			exp: &Config{
 				HTTPServer: HTTPServer{
@@ -115,6 +126,9 @@ func TestConfig(t *testing.T) {
 				Storage: Storage{
 					Type: cnst.StorageTypePostgres,
 					Conn: "postgres://user:secret@localhost:5555",
+				},
+				RabbitMQ: RabbitMQ{
+					Address: "amqp://env:envpswd@localhost:5678/",
 				},
 			},
 		},

@@ -25,6 +25,7 @@ linters-settings:
           - github.com/jackc/pgx
           - github.com/lib/pq
           - google.golang.org
+          - github.com/rabbitmq
       Test:
         files:
           - $test
